@@ -75,20 +75,40 @@ void CarIn(STACK *stack, QUEUE *queue)
 
 void ShowPark(STACK *stack, QUEUE *queue)
 {	
+	int i;
 	int stack_count = StackCount(stack);
 	int queue_count = QueueCount(queue);
-	
+	STACK temp_stack = {0};
+	CAR car;
 	if(stack_count > 0)
 	{
-		CAR *car = StackGetData(stack, NULL, NULL);
-		printf("有 %d 辆车在停车场, ", stack_count);
-		printf("最外面的车的车牌号是：%s\n", car->plate_number);
+		printf("停车场现在有%d车, ", stack_count);
+		printf("从北往南依次是: ");
+		for(i=0; i<stack_count; i++)
+		{
+			StackPop(&car, stack);
+			StackPush(&temp_stack, 0, &car, sizeof(car));
+		}
+		for(i=0; i<stack_count; i++)
+		{
+			StackPop(&car, &temp_stack);
+			printf("%s ", car.plate_number);
+			StackPush(stack, 0, &car, sizeof(car));
+		}
+
+		printf("\n");
 		
 		if(queue_count > 0)
 		{
-			CAR *car = QueueGetData(queue, NULL, NULL);
-			printf("有 %d 辆车停在便道等候, ", queue_count);
-			printf("最前面的车的车牌号是：%s\n", car->plate_number);
+			printf("便道处有%d辆车, ", queue_count);
+			printf("从前面到后面依次是: ");
+			for(i=0; i<queue_count; i++)
+			{
+				QueueRemove(&car, queue);
+				printf("%s ", car.plate_number);
+				QueueAdd(queue, 0, &car, sizeof(car));
+			}
+			printf("\n");
 		}
 	}
 	else
@@ -140,8 +160,8 @@ void CarOut(STACK *stack, QUEUE *queue)
 			printf("时间不可用\n");
 			exit(EXIT_FAILURE);
 		}
-		printf("%s停了%.2f 小时, ",plate_number, difftime(car.end, car.start)); 
-		printf("需要支付%.2f美元\n", difftime(car.end, car.start) * 5);
+		printf("%s停了%.2f 小时, ",plate_number, difftime(car.end, car.start) * 0.1); 
+		printf("需要支付%.2f元\n", difftime(car.end, car.start) * 0.2);
 		
 		/*便道里的第一辆车驶入停车场*/
 		if (queue_count > 0)

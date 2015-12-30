@@ -224,14 +224,29 @@ int print_tree(HTnode_t *tree, int size)
 {
 	int i;
 	int tree_size = size * 2 -1;
-	printf("%-8s%-6s%-16s%s\n", "wighted", "ascii", "code", "character");
+	printf("下面是输入文本的字符和其出现的次数\n");
+	printf("字符      :");
 	for(i=0; i<size; i++)
 	{
-		//if (tree[i].left != -1)
+		if(tree[i].data == ' ')
 		{
-			printf("%-8d%-6d%-16s%c\n", tree[i].wighted, tree[i].data, tree[i].code, tree[i].data);
+			printf("空格");
+		}
+		else if(tree[i].data == '\n')
+		{
+			printf("换行");
+		}
+		else
+		{
+			printf("%-4c",tree[i].data);
 		}
 	}
+	printf("\n出现的次数:");
+	for(i=0; i<size; i++)
+	{
+		printf("%-4d", tree[i].wighted);
+	}
+	printf("\n");
 	return 0;
 }
 
@@ -279,8 +294,8 @@ int encrypt(HTnode_t *tree, int size, char *text_file, char *code_file)
 	}
 	
 	int code_length = code_buf_index / 8 + 1 + sizeof(long); 
-	printf("要发送的文字为：\n%s\n", source_buf);
-	
+/* 	printf("要发送的文字为：\n%s\n", source_buf);
+	printf("编成二进制码:\n%s\n", code_buf); */
 	code = malloc(code_length);
 	check_null(code, "malloc");
 	memset(code, 0, code_length);
@@ -316,7 +331,7 @@ int encrypt(HTnode_t *tree, int size, char *text_file, char *code_file)
 	check_null(w, "fopen,wb");
 	fwrite(code, code_length, 1, w);
 	fclose(w);
-	printf("压缩发送成功\n");
+	printf("\n压缩发送成功\n");
 	printf("压缩前长度:%d, ", txt_length);
 	printf("压缩后长度:%d, ", code_length);
 	printf("压缩比:%.2f\n", (code_length * 1.00) / txt_length);
@@ -450,7 +465,7 @@ void send()
 		printf("init faild\n");
 		exit(EXIT_FAILURE);
 	}
-	printf("Please input text: (type \"exit\" to exit)\n");
+	printf("请输入要发送的文本: (结束时输入\"exit\")\n");
 	while(1)
 	{
 		fgets(buf, buf_size, stdin);
@@ -468,7 +483,7 @@ void send()
 
 	HTnode_t tree[size * 2 - 1];
 	creat_tree(tree, letter, size);
-	
+	print_tree(tree, size);
 	save_wighted(letter, KEY_FILE, size);
 	encrypt(tree, size, TXT_FILE, CODE_FILE);
 }
